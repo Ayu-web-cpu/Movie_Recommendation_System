@@ -7,6 +7,10 @@ This is a simple movie recommendation system built with Python and Streamlit. It
 - Recommends movies to users based on their preferences
 - User-based collaborative filtering using cosine similarity
 - Simple Streamlit web interface
+# Try the Movie Recommendation System Online!
+
+You can try the app here:  
+[Movie Recommendation System Streamlit App](https://movierecommendationsystem-4x5hdnnmpfxvnonukf35be.streamlit.app/)
 
 # How It Works
 
