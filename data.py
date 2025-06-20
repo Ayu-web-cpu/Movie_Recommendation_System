@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-
-# Sample movie list
 movies = [
     (1, "The Shawshank Redemption"),
     (2, "The Godfather"),
