@@ -3,13 +3,20 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import random
+import os
+
+st.title("Movie Recommendation System")
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv('movie_ratings_5000_with_names.csv')
-    df['movie_id'] = df['movie_id'].astype(str)
-    df['user_id'] = df['user_id'].astype(str)
-    return df
+    try:
+        df = pd.read_csv('movie_ratings_5000_with_names.csv')
+        df['movie_id'] = df['movie_id'].astype(str)
+        df['user_id'] = df['user_id'].astype(str)
+        return df
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return None
 
 def build_matrices(df):
     ratings_matrix = df.pivot_table(index='user_id', columns='movie_id', values='rating').fillna(0)
@@ -40,30 +47,30 @@ def recommend_movies(user_id, ratings_matrix, user_similarity_df, movie_id_to_na
     recommended_movie_names = [movie_id_to_name.get(movie_id, "Unknown") for movie_id in recommended_movie_ids]
     return list(zip(recommended_movie_ids, recommended_movie_names))
 
-
-st.title("Movie Recommendation System")
-
 df = load_data()
-ratings_matrix, user_similarity_df, movie_id_to_name = build_matrices(df)
+if df is not None:
+    ratings_matrix, user_similarity_df, movie_id_to_name = build_matrices(df)
 
+    # Find users with at least one unrated movie
+    valid_users = []
+    for test_user in ratings_matrix.index:
+        user_movies = set(ratings_matrix.loc[test_user][ratings_matrix.loc[test_user] > 0].index)
+        if len(user_movies) < len(ratings_matrix.columns):
+            valid_users.append(test_user)
 
-valid_users = []
-for test_user in ratings_matrix.index:
-    user_movies = set(ratings_matrix.loc[test_user][ratings_matrix.loc[test_user] > 0].index)
-    if len(user_movies) < len(ratings_matrix.columns):
-        valid_users.append(test_user)
+    if not valid_users:
+        st.error("No users with unrated movies found in the dataset.")
+        st.stop()
 
-if not valid_users:
-    st.error("No users with unrated movies found in the dataset.")
-    st.stop()
+    user_id = st.selectbox("Select a user ID", valid_users)
 
-user_id = st.selectbox("Select a user ID", valid_users)
-
-if st.button("Recommend a Movie"):
-    recommended = recommend_movies(user_id, ratings_matrix, user_similarity_df, movie_id_to_name, num_recommendations=1)
-    if recommended:
-        movie_id, movie_name = recommended[0]
-        st.success(f"Recommended movie for user {user_id}:")
-        st.write(f"**{movie_name}** (Movie ID: {movie_id})")
-    else:
-        st.warning("No recommendation available for this user.")
+    if st.button("Recommend a Movie"):
+        recommended = recommend_movies(user_id, ratings_matrix, user_similarity_df, movie_id_to_name, num_recommendations=1)
+        if recommended:
+            movie_id, movie_name = recommended[0]
+            st.success(f"Recommended movie for user {user_id}:")
+            st.write(f"**{movie_name}** (Movie ID: {movie_id})")
+        else:
+            st.warning("No recommendation available for this user.")
+else:
+    st.error("Dataset could not be loaded. Please check that 'movie_ratings_5000_with_names.csv' exists in your app directory.")
