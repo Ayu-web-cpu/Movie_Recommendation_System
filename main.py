@@ -34,7 +34,7 @@ def recommend_movies(user_id, num_recommendations=1):
     recommended_movie_names = [movie_id_to_name.get(movie_id, "Unknown") for movie_id in recommended_movie_ids]
     return list(zip(recommended_movie_ids, recommended_movie_names))
 
-# Pick a random user with at least one unrated movie
+
 valid_users = []
 for test_user in ratings_matrix.index:
     user_movies = set(ratings_matrix.loc[test_user][ratings_matrix.loc[test_user] > 0].index)
