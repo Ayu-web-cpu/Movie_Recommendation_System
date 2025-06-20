@@ -40,13 +40,13 @@ def recommend_movies(user_id, ratings_matrix, user_similarity_df, movie_id_to_na
     recommended_movie_names = [movie_id_to_name.get(movie_id, "Unknown") for movie_id in recommended_movie_ids]
     return list(zip(recommended_movie_ids, recommended_movie_names))
 
-# Streamlit UI
+
 st.title("Movie Recommendation System")
 
 df = load_data()
 ratings_matrix, user_similarity_df, movie_id_to_name = build_matrices(df)
 
-# Find users with at least one unrated movie
+
 valid_users = []
 for test_user in ratings_matrix.index:
     user_movies = set(ratings_matrix.loc[test_user][ratings_matrix.loc[test_user] > 0].index)
